@@ -6,7 +6,7 @@
 # https://doc.scrapy.org/en/latest/topics/spider-middleware.html
 
 from scrapy import signals
-
+import re
 
 class KezhanCrawlerSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
@@ -107,14 +107,13 @@ class KezhanCrawlerDownloaderMiddleware(object):
 
 from scrapy.http import HtmlResponse
 
+
 class JSPageMiddleware(object):
 
     # 通过chrome请求动态网页
     def process_request(self, request, spider):
-        if spider.name == "mooc":
+        if spider.name == "mooc" and re.match('.*(www.icourse163.org).*', request.url):
             spider.browser.get(request.url)
-            import time
-            time.sleep(3)
-            # print("访问:{0}".format(request.url))
+            print("Start in :{0}".format(request.url))
             return HtmlResponse(url=spider.browser.current_url, body=spider.browser.page_source, encoding="utf-8",
                                 request=request)
