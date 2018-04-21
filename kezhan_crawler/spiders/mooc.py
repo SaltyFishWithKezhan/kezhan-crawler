@@ -42,11 +42,11 @@ class MoocSpider(scrapy.Spider):
 
         # acquire all course links thumbnial urls
         courses_links = []
-        debug_num = 2333333333
+        debug_num = 23333333333
         while debug_num > 0:
             try:
                 # acquire course detail infos, passing through prase_detail
-                time.sleep(1)
+                time.sleep(2)
                 next_btn = self.browser.find_element_by_css_selector('.ux-pager_btn.ux-pager_btn__next:not(.z-dis)')
                 course_nodes = self.browser.find_elements_by_css_selector(".u-clist.f-bg.f-cb.f-pr.j-href.ga-click")
                 for course_node in course_nodes:
@@ -60,6 +60,7 @@ class MoocSpider(scrapy.Spider):
         print(len(courses_links))
         print(courses_links)
 
+        # each course
         for course_link in courses_links:
             course_url = parse.urljoin(response.url, course_link[0])
 
@@ -67,8 +68,12 @@ class MoocSpider(scrapy.Spider):
             self.browser.get(course_url)
             time.sleep(2)
 
-            # parse detail page
-            course_title = self.browser.find_element_by_css_selector('.course-title.f-ib.f-vam').text
+            # parse detail page, break when url errors occure
+            raw_course_title = self.browser.find_elements_by_css_selector('.course-title.f-ib.f-vam')
+            if (len(raw_course_title) > 0):
+                course_title = raw_course_title.text;
+            else:
+                continue
 
             course_school = self.browser.find_element_by_css_selector('.m-teachers_school-img.f-ib').get_attribute(
                 'data-label')
@@ -97,6 +102,11 @@ class MoocSpider(scrapy.Spider):
                 is_national = 1
             else:
                 is_national = 0
+
+            labels = ''
+            raw_labels = self.browser.find_elements_by_css_selector('span.breadcrumb_item')
+            for raw_label in raw_labels:
+                labels = labels + raw_label.text + ','
 
             # going to comment page
             comment_btn = self.browser.find_element_by_css_selector('#review-tag-button')
@@ -131,6 +141,7 @@ class MoocSpider(scrapy.Spider):
             course_item['attend_count'] = attend_count
             course_item['comment_count'] = comment_count
             course_item['rating'] = rating
-            course_item['is_national'] = is_national;
+            course_item['is_national'] = is_national
+            course_item['labels'] = labels
 
             yield course_item

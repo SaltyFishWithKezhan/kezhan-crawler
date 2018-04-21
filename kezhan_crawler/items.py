@@ -28,11 +28,12 @@ class MoocCourseItem(scrapy.Item):
     comment_count = scrapy.Field()
     rating = scrapy.Field()
     is_national = scrapy.Field()
+    labels = scrapy.Field()
 
     def get_insert_sql(self):
         insert_sql = """
-            replace into kz_dm.mooc_course(title, school, instructors, create_date, url, url_object_id, front_image_url, front_image_path, description, attend_count, comment_count, rating, is_national)
-            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            replace into kz_dm.mooc_course(title, school, instructors, create_date, url, url_object_id, front_image_url, front_image_path, description, attend_count, comment_count, rating, is_national, labels)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
         if self["front_image_url"]:
@@ -40,5 +41,5 @@ class MoocCourseItem(scrapy.Item):
                 self["title"], self['school'], self['instructors'], self["create_date"], self["url"],
                 self['url_object_id'],
                 self['front_image_url'][0], self['front_image_path'], self['description'], self['attend_count'], self['comment_count'],
-                self['rating'], self['is_national'])
+                self['rating'], self['is_national'], self['labels'])
         return insert_sql, params
