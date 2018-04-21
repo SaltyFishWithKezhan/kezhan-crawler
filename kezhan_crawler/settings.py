@@ -71,7 +71,7 @@ IMAGES_STORE = os.path.join(project_dir, 'images')
 # See https://doc.scrapy.org/en/latest/topics/item-pipeline.html
 ITEM_PIPELINES = {
     # 'kezhan_crawler.pipelines.KezhanCrawlerPipeline': 300,
-    'kezhan_crawler.pipelines.MySQLTwistedPipeline': 10,
+    'kezhan_crawler.pipelines.MySQLTwistedPipeline': 100,
     'kezhan_crawler.pipelines.CourseImagePipeline': 1,
 }
 
