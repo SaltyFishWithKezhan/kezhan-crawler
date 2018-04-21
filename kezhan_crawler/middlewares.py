@@ -8,6 +8,7 @@
 from scrapy import signals
 import re
 
+
 class KezhanCrawlerSpiderMiddleware(object):
     # Not all methods need to be defined. If a method is not defined,
     # scrapy acts as if the spider middleware does not modify the
@@ -112,7 +113,9 @@ class JSPageMiddleware(object):
 
     # 通过chrome请求动态网页
     def process_request(self, request, spider):
-        if spider.name == "mooc" and re.match('.*(www.icourse163.org).*', request.url):
+        if spider.name == "mooc" and re.match('.*(www.icourse163.org).*',
+                                              request.url) or spider.name == 'netease' and re.match(
+                '.*(study.163.com).*', request.url):
             spider.browser.get(request.url)
             print("Start in :{0}".format(request.url))
             return HtmlResponse(url=spider.browser.current_url, body=spider.browser.page_source, encoding="utf-8",

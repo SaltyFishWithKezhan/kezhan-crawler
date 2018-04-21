@@ -42,27 +42,30 @@ class MoocSpider(scrapy.Spider):
 
         # acquire all course links thumbnial urls
         courses_links = []
-        debug_num = 23333333333
+        debug_num = 23333333
         while debug_num > 0:
             try:
                 # acquire course detail infos, passing through prase_detail
-                time.sleep(2)
+                time.sleep(1)
                 next_btn = self.browser.find_element_by_css_selector('.ux-pager_btn.ux-pager_btn__next:not(.z-dis)')
                 course_nodes = self.browser.find_elements_by_css_selector(".u-clist.f-bg.f-cb.f-pr.j-href.ga-click")
                 for course_node in course_nodes:
-                    tmp_urls = [course_node.find_element_by_css_selector('a').get_attribute('href'),
-                                course_node.find_element_by_css_selector('img').get_attribute('src')]
+                    tmp_urls = {'course_url':course_node.find_element_by_css_selector('a').get_attribute('href'),
+                                'front_image_url':course_node.find_element_by_css_selector('img').get_attribute('src'),}
                     courses_links.append(tmp_urls)
                 next_btn.click()
                 debug_num = debug_num - 1
             except:
                 break
+
+        import json
         print(len(courses_links))
-        print(courses_links)
+        with open('mooc_course_links.json', 'w') as outfile:
+            json.dump(courses_links, outfile)
 
         # each course
         for course_link in courses_links:
-            course_url = parse.urljoin(response.url, course_link[0])
+            course_url = parse.urljoin(response.url, course_link['course_url'])
 
             # going to detail page
             self.browser.get(course_url)
@@ -70,8 +73,8 @@ class MoocSpider(scrapy.Spider):
 
             # parse detail page, break when url errors occure
             raw_course_title = self.browser.find_elements_by_css_selector('.course-title.f-ib.f-vam')
-            if (len(raw_course_title) > 0):
-                course_title = raw_course_title.text;
+            if len(raw_course_title) > 0:
+                course_title = raw_course_title[0].text;
             else:
                 continue
 
@@ -84,7 +87,7 @@ class MoocSpider(scrapy.Spider):
                 course_instructor = course_instructor + ',' + raw_course_instructor.text
 
             course_desc = self.browser.find_elements_by_css_selector('#j-rectxt2')
-            if (len(course_desc) > 0):
+            if len(course_desc) > 0:
                 course_desc = course_desc[0].text
             else:
                 course_desc = 'Unknown'
@@ -98,7 +101,7 @@ class MoocSpider(scrapy.Spider):
                 attend_count = 0
 
             raw_is_national = self.browser.find_elements_by_css_selector('#j-tag')
-            if (len(raw_is_national) > 0):
+            if len(raw_is_national) > 0:
                 is_national = 1
             else:
                 is_national = 0
@@ -123,7 +126,7 @@ class MoocSpider(scrapy.Spider):
 
             rating = self.browser.find_elements_by_css_selector(
                 '.ux-mooc-comment-course-comment_head_rating-scores > span')
-            if (len(rating) > 0):
+            if len(rating) > 0:
                 rating = rating[0].text
             else:
                 rating = -1
@@ -136,7 +139,7 @@ class MoocSpider(scrapy.Spider):
             course_item['url'] = course_url
             course_item['url_object_id'] = get_md5(course_url)
             course_item['create_date'] = time.strftime('%Y-%m-%d', time.localtime(time.time()))
-            course_item['front_image_url'] = [course_link[1]]
+            course_item['front_image_url'] = [course_link['front_image_url']]
             course_item['description'] = course_desc
             course_item['attend_count'] = attend_count
             course_item['comment_count'] = comment_count

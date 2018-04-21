@@ -36,10 +36,41 @@ class MoocCourseItem(scrapy.Item):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
 
-        if self["front_image_url"]:
-            params = (
-                self["title"], self['school'], self['instructors'], self["create_date"], self["url"],
-                self['url_object_id'],
-                self['front_image_url'][0], self['front_image_path'], self['description'], self['attend_count'], self['comment_count'],
-                self['rating'], self['is_national'], self['labels'])
+        params = (
+            self["title"], self['school'], self['instructors'], self["create_date"], self["url"],
+            self['url_object_id'],
+            self['front_image_url'][0], self['front_image_path'], self['description'], self['attend_count'],
+            self['comment_count'],
+            self['rating'], self['is_national'], self['labels'])
+        return insert_sql, params
+
+
+class NetEaseCourseItem(scrapy.Item):
+    title = scrapy.Field()
+    school = scrapy.Field()
+    for_desc = scrapy.Field()
+    create_date = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    front_image_url = scrapy.Field()
+    front_image_path = scrapy.Field()
+    description = scrapy.Field()
+    attend_count = scrapy.Field()
+    comment_count = scrapy.Field()
+    rating = scrapy.Field()
+    price = scrapy.Field()
+    labels = scrapy.Field()
+
+    def get_insert_sql(self):
+        insert_sql = """
+            replace into kz_dm.netease_course(title, school, for_desc, create_date, url, url_object_id, front_image_url, front_image_path, description, attend_count, comment_count, rating, price, labels)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+
+        params = (
+            self["title"], self['school'], self['for_desc'], self["create_date"], self["url"],
+            self['url_object_id'],
+            self['front_image_url'][0], self['front_image_path'], self['description'], self['attend_count'],
+            self['comment_count'],
+            self['rating'], self['price'], self['labels'])
         return insert_sql, params
