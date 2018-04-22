@@ -42,7 +42,7 @@ class NeteaseSpider(scrapy.Spider):
 
         # acquire all course links thumbnial urls
         courses_links = []
-        debug_num = 2
+        debug_num = 2333333
         while debug_num > 0:
             try:
                 # acquire course detail infos, passing through prase_detail
@@ -80,7 +80,7 @@ class NeteaseSpider(scrapy.Spider):
 
             # going to detail page
             self.browser.get(course_url)
-            time.sleep(2)
+            time.sleep(1.5)
 
             course_desc = self.browser.find_elements_by_css_selector('div.cintrocon.j-courseintro')
             if len(course_desc) > 0:
