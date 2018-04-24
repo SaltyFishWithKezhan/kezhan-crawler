@@ -8,6 +8,9 @@
 import scrapy
 import datetime
 import re
+from scrapy.loader import ItemLoader
+from scrapy.loader.processors import MapCompose, TakeFirst, Join
+from w3lib.html import remove_tags
 
 
 class KezhanCrawlerItem(scrapy.Item):
@@ -73,4 +76,67 @@ class NetEaseCourseItem(scrapy.Item):
             self['front_image_url'][0], self['front_image_path'], self['description'], self['attend_count'],
             self['comment_count'],
             self['rating'], self['price'], self['labels'])
+        return insert_sql, params
+
+def replace_splash(value):
+    return value.replace("/", "")
+
+
+def handle_strip(value):
+    return value.strip()
+
+
+def handle_jobaddr(value):
+    addr_list = value.split("\n")
+    addr_list = [item.strip() for item in addr_list if item.strip() != "查看地图"]
+    return "".join(addr_list)
+
+class LagouJobItemLoader(ItemLoader):
+    # 自定义itemloader
+    default_output_processor = TakeFirst()
+
+
+class LagouJobItem(scrapy.Item):
+    # 拉勾网职位
+    title = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    salary = scrapy.Field()
+    job_city = scrapy.Field(
+        input_processor=MapCompose(replace_splash),
+    )
+    work_years = scrapy.Field(
+        input_processor=MapCompose(replace_splash),
+    )
+    degree_need = scrapy.Field(
+        input_processor=MapCompose(replace_splash),
+    )
+    job_type = scrapy.Field()
+    publish_time = scrapy.Field()
+    job_advantage = scrapy.Field()
+    job_desc = scrapy.Field(
+        input_processor=MapCompose(handle_strip),
+    )
+    job_addr = scrapy.Field(
+        input_processor=MapCompose(remove_tags, handle_jobaddr),
+    )
+    company_name = scrapy.Field(
+        input_processor=MapCompose(handle_strip),
+    )
+    company_url = scrapy.Field()
+    crawl_time = scrapy.Field()
+    crawl_update_time = scrapy.Field()
+
+    def get_insert_sql(self):
+        insert_sql = """
+            replace into kz_dm.lagou_job(title, url, url_object_id, salary, job_city, work_years, degree_need,
+            job_type, publish_time, job_advantage, job_desc, job_addr, company_url, company_name)
+            VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+        """
+        params = (
+        self["title"], self["url"], self['url_object_id'], self["salary"], self["job_city"], self["work_years"],
+        self["degree_need"],
+        self["job_type"], self["publish_time"], self["job_advantage"], self["job_desc"], self["job_addr"],
+        self["company_url"], self["company_name"])
+
         return insert_sql, params

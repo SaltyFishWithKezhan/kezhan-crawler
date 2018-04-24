@@ -55,6 +55,7 @@ COOKIES_ENABLED = False
 # See https://doc.scrapy.org/en/latest/topics/downloader-middleware.html
 DOWNLOADER_MIDDLEWARES = {
     # 'kezhan_crawler.middlewares.KezhanCrawlerDownloaderMiddleware': 543,
+    'kezhan_crawler.middlewares.RandomUserAgentMiddleware': 300,
     'kezhan_crawler.middlewares.JSPageMiddleware': 137
 }
 IMAGES_URLS_FIELD = "front_image_url"
