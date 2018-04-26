@@ -78,6 +78,7 @@ class NetEaseCourseItem(scrapy.Item):
             self['rating'], self['price'], self['labels'])
         return insert_sql, params
 
+
 def replace_splash(value):
     return value.replace("/", "")
 
@@ -90,6 +91,7 @@ def handle_jobaddr(value):
     addr_list = value.split("\n")
     addr_list = [item.strip() for item in addr_list if item.strip() != "查看地图"]
     return "".join(addr_list)
+
 
 class LagouJobItemLoader(ItemLoader):
     # 自定义itemloader
@@ -134,9 +136,38 @@ class LagouJobItem(scrapy.Item):
             VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
         """
         params = (
-        self["title"], self["url"], self['url_object_id'], self["salary"], self["job_city"], self["work_years"],
-        self["degree_need"],
-        self["job_type"], self["publish_time"], self["job_advantage"], self["job_desc"], self["job_addr"],
-        self["company_url"], self["company_name"])
+            self["title"], self["url"], self['url_object_id'], self["salary"], self["job_city"], self["work_years"],
+            self["degree_need"],
+            self["job_type"], self["publish_time"], self["job_advantage"], self["job_desc"], self["job_addr"],
+            self["company_url"], self["company_name"])
 
+        return insert_sql, params
+
+
+class ImoocFreeItem(scrapy.Item):
+    title = scrapy.Field()
+    target = scrapy.Field()
+    url = scrapy.Field()
+    url_object_id = scrapy.Field()
+    front_image_url = scrapy.Field()
+    front_image_path = scrapy.Field()
+    description = scrapy.Field()
+    attend_count = scrapy.Field()
+    rating = scrapy.Field()
+    labels = scrapy.Field()
+    difficulty = scrapy.Field()
+    tutor = scrapy.Field()
+    pre_request = scrapy.Field()
+    time_length = scrapy.Field()
+    comment_count = scrapy.Field()
+
+    def get_insert_sql(self):
+        insert_sql = """
+                replace into kz_dm.imooc_free(title, url, url_object_id, front_image_url, front_image_path, labels, difficulty, attend_count, time_length, rating, tutor, target, pre_request, description, comment_count)
+                VALUES (%s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s, %s)
+            """
+
+        params = (self['title'], self['url'], self['url_object_id'], self['front_image_url'], self['front_image_path'],
+                  self['labels'], self['difficulty'], ['attend_count'], self['time_length'], self['rating'], self['tutor'],
+                  self['target'], self['pre_request'], self['description'], self['comment_count'])
         return insert_sql, params
