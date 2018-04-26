@@ -28,7 +28,7 @@ class ImoocFreeSpider(scrapy.Spider):
             labels = course_node.css('label::text').extract()
             course_label = ''
             for label in labels:
-                course_label = label + ','
+                course_label = course_label + label + ','
             yield Request(url=parse.urljoin(response.url, course_url), meta={"front_image_url": [image_url],
                                                                              'attend_count': attend_count,
                                                                              'labels': course_label},
